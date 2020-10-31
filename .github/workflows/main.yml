@@ -28,7 +28,7 @@ jobs:
 
   create-release:
     env:
-      commitmsg: ${{ github.event.head_commit.message }}
+      commitmsg: ${{ github.event.head_commit }}
     # The type of runner that the job will run on          
     runs-on: ubuntu-latest
 
