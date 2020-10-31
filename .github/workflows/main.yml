@@ -41,7 +41,8 @@ jobs:
         fetch-depth: 0
     - name: test
       run: echo "${GITHUB_REF}"
-
+    - name: test2
+      run: echo "$commitmsg"
     # Runs only in the case when the workflow is triggered by a commit push.
     # Fetches & scraps branch name from value of Github environment variable (GITHUB_REF) when there is a commit push.
     # This will be later used to be passed to --ensure-channel flag in Makefile.
