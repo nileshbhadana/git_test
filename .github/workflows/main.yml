@@ -1,0 +1,58 @@
+# Name of the Workflow
+
+name: Replicated KOTS release
+
+# Controls when the action will run. Triggers the workflow on commit push from the branchs listed.
+# Also, triggers the workflow when matched the expression/pattern defined under tags: field.
+on:
+  push:
+    branches: 
+      - trial
+    tags:
+    - '*-alpha'
+    - '*-trial'
+    paths:
+    - '**'
+    - '!kurl-installer.yaml'
+    - '!images/**'
+    - '!**.png'
+
+# Under jobs: field, we have a job named "create-release" whose final outcome is to create two releases.
+# 1. Release on Replicated KOTS vendor.
+# 2. Release on Github Release page (for local testing).
+
+jobs:         
+
+  # This workflow contains a single job called "create-release"
+
+  create-release:
+    env:
+      commitmsg: ${{ github.event.head_commit.message }}
+    # The type of runner that the job will run on          
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 0
+    - name: test
+      run: echo "${GITHUB_REF}"
+
+    # Runs only in the case when the workflow is triggered by a commit push.
+    # Fetches & scraps branch name from value of Github environment variable (GITHUB_REF) when there is a commit push.
+    # This will be later used to be passed to --ensure-channel flag in Makefile.
+    - name: (On commit push) Get branch name
+      if: startsWith(github.ref, 'refs/heads')
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: get_branch
+      
+    # Runs only in the case when the workflow is triggered by tag push.
+    # Fetches & scraps branch name from value of Github environment variable (GITHUB_REF) when there is a tag push.
+    # This will be later used to be passed to --ensure-channel flag in the Makefile.
+    - name: (On tags push) Get branch name
+      if: startsWith(github.ref, 'refs/tags')
+      run: echo ::set-output name=branch::$(echo $GITHUB_REF | cut -d - -f 2)
+      id: get_branch1
