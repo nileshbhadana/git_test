@@ -27,8 +27,6 @@ jobs:
   # This workflow contains a single job called "create-release"
 
   create-release:
-    env:
-      commitmsg: ${{ github.event.head_commit.message }}
     # The type of runner that the job will run on          
     runs-on: ubuntu-latest
 
@@ -41,12 +39,11 @@ jobs:
         fetch-depth: 0
     - name: test
       run: echo "${GITHUB_REF}"
+      
     - name: test2
       run: echo "$commitmsg"
-    - name: Dump GitHub context
       env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
+        commitmsg: ${{ github.event.head_commit.message }}
     # Runs only in the case when the workflow is triggered by a commit push.
     # Fetches & scraps branch name from value of Github environment variable (GITHUB_REF) when there is a commit push.
     # This will be later used to be passed to --ensure-channel flag in Makefile.
